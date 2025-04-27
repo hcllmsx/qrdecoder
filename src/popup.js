@@ -19,11 +19,23 @@ function hideError() {
   errorDiv.style.display = 'none';
 }
 function showResult(text) {
+  // 移除旧按钮组
+  const oldGroup = document.getElementById('qr-btn-group');
+  if (oldGroup && oldGroup.parentNode) oldGroup.parentNode.removeChild(oldGroup);
   resultDiv.innerHTML = '';
   if (!text) return;
   // 判断是否网址
   const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\/\?%&=]*)?$/i;
-  resultDiv.textContent = text;
+  // 内容单独div
+  const contentDiv = document.createElement('div');
+  contentDiv.textContent = text;
+  resultDiv.appendChild(contentDiv);
+  resultDiv.style.display = 'block';
+  // 创建按钮组
+  const btnGroup = document.createElement('div');
+  btnGroup.id = 'qr-btn-group';
+  btnGroup.style.textAlign = 'center';
+  btnGroup.style.marginTop = '14px';
   const btnCopy = document.createElement('button');
   btnCopy.textContent = '一键复制';
   btnCopy.className = 'btn blue';
@@ -33,8 +45,7 @@ function showResult(text) {
       setTimeout(()=>btnCopy.textContent='一键复制', 1200);
     });
   };
-  resultDiv.appendChild(document.createElement('br'));
-  resultDiv.appendChild(btnCopy);
+  btnGroup.appendChild(btnCopy);
   if (urlPattern.test(text)) {
     const btnOpen = document.createElement('button');
     btnOpen.textContent = '新标签页打开';
@@ -44,12 +55,17 @@ function showResult(text) {
       if (!/^https?:\/\//i.test(url)) url = 'http://' + url;
       window.open(url, '_blank');
     };
-    resultDiv.appendChild(btnOpen);
+    btnGroup.appendChild(btnOpen);
   }
-  resultDiv.style.display = 'block';
+  // 将按钮组插入到 resultDiv 后面
+  resultDiv.parentNode && resultDiv.parentNode.insertBefore(btnGroup, resultDiv.nextSibling);
 }
+
 function hideResult() {
   resultDiv.style.display = 'none';
+  // 移除按钮组
+  const oldGroup = document.getElementById('qr-btn-group');
+  if (oldGroup && oldGroup.parentNode) oldGroup.parentNode.removeChild(oldGroup);
 }
 
 function doScan(delay = 0) {
