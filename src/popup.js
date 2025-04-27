@@ -181,3 +181,74 @@ function decodeQRCodeFromDataUrl(dataUrl) {
 
 scanBtn.onclick = () => doScan(0);
 delayBtn.onclick = () => doScan(3);
+regionBtn.onclick = () => regionScanDelay(3);
+
+// 区域截图识别模式
+function regionScanDelay(delay = 3) {
+  hideResult();
+  hideError();
+  showLoading(false);
+  let sec = delay;
+  countdown.textContent = sec + ' 秒后可框选区域';
+  countdown.style.display = 'inline';
+  if (window._regionTimer) clearInterval(window._regionTimer);
+  window._regionTimer = setInterval(() => {
+    sec--;
+    countdown.textContent = sec > 0 ? sec + ' 秒后可框选区域' : '';
+    if (sec <= 0) {
+      clearInterval(window._regionTimer);
+      countdown.style.display = 'none';
+      startRegionSelect();
+    }
+  }, 1000);
+}
+
+function startRegionSelect() {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.runtime.sendMessage({
+      action: 'injectRegionScript',
+      tabId: tabs[0].id
+    });
+  });
+}
+
+// 监听内容脚本的区域坐标，后台截图并裁剪
+window.addEventListener('message', function(e) {
+  if (!e.data || !e.data.qrdecoder_region) return;
+  const {x, y, w, h} = e.data.qrdecoder_region;
+  // 通知popup后台截图
+  chrome.runtime.sendMessage({action: 'captureScreenshot'}, (response) => {
+    if (!response || response.error) {
+      showLoading(false);
+      showError(response ? response.error : '插件后台无响应');
+      return;
+    }
+    cropAndDecode(response.dataUrl, x, y, w, h);
+  });
+});
+
+function cropAndDecode(dataUrl, x, y, w, h) {
+  showLoading(true);
+  const img = new window.Image();
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(img, x, y, w, h, 0, 0, w, h);
+    const croppedDataUrl = canvas.toDataURL('image/png');
+    decodeQRCodeFromDataUrl(croppedDataUrl).then(result => {
+      showLoading(false);
+      if (result.error) {
+        showError(result.error);
+      } else if (result.multi) {
+        showMultiResult(result.multi);
+      } else {
+        showResult(result.data);
+      }
+    });
+  };
+  img.onerror = function() {
+    showError('图片加载失败');
+  };
+  img.src = dataUrl;
+}
