@@ -26,7 +26,7 @@ function showResult(text) {
   resultDiv.textContent = text;
   const btnCopy = document.createElement('button');
   btnCopy.textContent = '一键复制';
-  btnCopy.className = 'btn';
+  btnCopy.className = 'btn blue';
   btnCopy.onclick = () => {
     navigator.clipboard.writeText(text).then(() => {
       btnCopy.textContent = '已复制!';
@@ -38,7 +38,7 @@ function showResult(text) {
   if (urlPattern.test(text)) {
     const btnOpen = document.createElement('button');
     btnOpen.textContent = '新标签页打开';
-    btnOpen.className = 'btn secondary';
+    btnOpen.className = 'btn blue';
     btnOpen.onclick = () => {
       let url = text;
       if (!/^https?:\/\//i.test(url)) url = 'http://' + url;
@@ -59,10 +59,11 @@ function doScan(delay = 0) {
   if (delay > 0) {
     let sec = delay;
     countdown.textContent = sec + ' 秒';
-    countdown.style.display = 'inline';
+    countdown.style.display = 'block';
     countdownTimer = setInterval(() => {
       sec--;
       countdown.textContent = sec > 0 ? sec + ' 秒' : '';
+      countdown.style.display = countdown.textContent ? 'block' : 'none';
       if (sec <= 0) {
         clearInterval(countdownTimer);
         countdown.style.display = 'none';
@@ -190,11 +191,12 @@ function regionScanDelay(delay = 3) {
   showLoading(false);
   let sec = delay;
   countdown.textContent = sec + ' 秒后可框选区域';
-  countdown.style.display = 'inline';
+  countdown.style.display = 'block';
   if (window._regionTimer) clearInterval(window._regionTimer);
   window._regionTimer = setInterval(() => {
     sec--;
     countdown.textContent = sec > 0 ? sec + ' 秒后可框选区域' : '';
+    countdown.style.display = countdown.textContent ? 'block' : 'none';
     if (sec <= 0) {
       clearInterval(window._regionTimer);
       countdown.style.display = 'none';

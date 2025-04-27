@@ -24,28 +24,49 @@
       display: inline-block;
       margin: 4px 6px 4px 0;
       padding: 6px 14px;
-      background: #4caf50;
+      background: #444;
       color: #fff;
       border: none;
       border-radius: 4px;
       font-size: 14px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.18s;
     }
-    .btn:active { background: #388e3c; }
-    .btn.secondary { background: #2196f3; }
-    .btn.secondary:active { background: #1565c0; }
-    #countdown { color: #e53935; font-weight: bold; margin-left: 8px; }
+    .btn:hover {
+      background: #43b047;
+    }
+    .btn:active {
+      background: #388e3c;
+    }
+    .btn.blue {
+      background: #2196f3;
+    }
+    .btn.blue:hover {
+      background: #43b047;
+    }
+    .btn.blue:active {
+      background: #1565c0;
+    }
+    #countdown {
+      color: #e53935;
+      font-weight: bold;
+      margin: 18px 0 8px 0;
+      text-align: center;
+      font-size: 18px;
+      display: block;
+    }
     #loading { color: #888; font-size: 14px; }
     #error { color: #e53935; font-size: 14px; }
   </style>
 </head>
 <body>
   <h2 style="margin-top:0;margin-bottom:12px;font-size:20px;">QRdecoder</h2>
-  <button class="btn" id="scanBtn">立即扫描</button>
-  <button class="btn secondary" id="delayBtn">延迟扫描</button>
-  <button class="btn secondary" id="regionBtn">区域截图</button>
-  <span id="countdown"></span>
+  <div class="btn-group" style="text-align:center;">
+    <button class="btn" id="scanBtn">立即扫描</button>
+    <button class="btn secondary" id="delayBtn">延迟扫描</button>
+    <button class="btn secondary" id="regionBtn">区域截图</button>
+  </div>
+  <div id="countdown" style="display:none;"></div>
   <div id="loading" style="display:none;">正在扫描二维码...</div>
   <div id="result" style="display:none;"></div>
   <div id="error" style="display:none;"></div>
