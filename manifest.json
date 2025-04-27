@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "QRdecoder",
+  "version": "1.0",
+  "description": "自动扫描当前网页二维码并解码，支持延迟扫描、复制和新标签页打开。",
+  "icons": {
+    "16": "src/qrdecoder-icon.png",
+    "32": "src/qrdecoder-icon.png",
+    "48": "src/qrdecoder-icon.png",
+    "128": "src/qrdecoder-icon.png"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "clipboardWrite"
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_icon": "src/qrdecoder-icon.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["src/jsQR.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

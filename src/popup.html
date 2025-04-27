@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>QRdecoder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      min-width: 320px;
+      padding: 18px 12px 12px 12px;
+      background: #f7f7fa;
+      color: #222;
+    }
+    #result {
+      margin: 16px 0;
+      padding: 10px;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      word-break: break-all;
+      font-size: 15px;
+    }
+    .btn {
+      display: inline-block;
+      margin: 4px 6px 4px 0;
+      padding: 6px 14px;
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:active { background: #388e3c; }
+    .btn.secondary { background: #2196f3; }
+    .btn.secondary:active { background: #1565c0; }
+    #countdown { color: #e53935; font-weight: bold; margin-left: 8px; }
+    #loading { color: #888; font-size: 14px; }
+    #error { color: #e53935; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h2 style="margin-top:0;margin-bottom:12px;font-size:20px;">QRdecoder</h2>
+  <button class="btn" id="scanBtn">立即扫描</button>
+  <button class="btn secondary" id="delayBtn">延迟扫描(3秒)</button>
+  <span id="countdown"></span>
+  <div id="loading" style="display:none;">正在扫描二维码...</div>
+  <div id="result" style="display:none;"></div>
+  <div id="error" style="display:none;"></div>
+  <script src="jsQR.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
