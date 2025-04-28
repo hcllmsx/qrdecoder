@@ -66,6 +66,7 @@ function hideResult() {
   // 移除按钮组
   const oldGroup = document.getElementById('qr-btn-group');
   if (oldGroup && oldGroup.parentNode) oldGroup.parentNode.removeChild(oldGroup);
+  hideUploadBtns();
 }
 
 function doScan(delay = 0) {
@@ -198,7 +199,93 @@ function decodeQRCodeFromDataUrl(dataUrl) {
 
 scanBtn.onclick = () => doScan(0);
 delayBtn.onclick = () => doScan(3);
-regionBtn.onclick = () => regionScanDelay(3);
+regionBtn.onclick = () => { hideUploadBtns(); regionScanDelay(3); };
+// 手动上传按钮
+const uploadBtn = document.getElementById('uploadBtn');
+uploadBtn.onclick = showUploadBtns;
+
+function showUploadBtns() {
+  hideResult();
+  hideError();
+  hideUploadBtns();
+  // 创建操作按钮组
+  const uploadGroup = document.createElement('div');
+  uploadGroup.id = 'qr-upload-group';
+  uploadGroup.style.textAlign = 'center';
+  // 读取剪切板按钮
+  const btnClipboard = document.createElement('button');
+  btnClipboard.textContent = '读取剪切板';
+  btnClipboard.className = 'btn blue';
+  btnClipboard.style.marginRight = '12px';
+  btnClipboard.onclick = async () => {
+    btnClipboard.disabled = true;
+    try {
+      if (navigator.clipboard && navigator.clipboard.read) {
+        const items = await navigator.clipboard.read();
+        for (const item of items) {
+          for (const type of item.types) {
+            if (type.startsWith('image/')) {
+              const blob = await item.getType(type);
+              const reader = new FileReader();
+              reader.onload = e => {
+                decodeQRCodeFromDataUrl(e.target.result).then(result => {
+                  if (result.error) showError(result.error);
+                  else if (result.multi) showMultiResult(result.multi);
+                  else showResult(result.data);
+                });
+              };
+              reader.readAsDataURL(blob);
+              return;
+            }
+          }
+        }
+        showError('剪切板中没有图片');
+      } else {
+        showError('当前浏览器不支持图片剪切板读取');
+      }
+    } catch (e) {
+      showError('读取剪切板失败: ' + e.message);
+    } finally {
+      btnClipboard.disabled = false;
+    }
+  };
+  uploadGroup.appendChild(btnClipboard);
+  // 上传文件按钮
+  const btnFile = document.createElement('button');
+  btnFile.textContent = '上传文件';
+  btnFile.className = 'btn blue';
+  btnFile.onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = () => {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          decodeQRCodeFromDataUrl(e.target.result).then(result => {
+            if (result.error) showError(result.error);
+            else if (result.multi) showMultiResult(result.multi);
+            else showResult(result.data);
+          });
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    };
+    input.click();
+  };
+  uploadGroup.appendChild(btnFile);
+  // 显示到倒计时区域
+  const countdown = document.getElementById('countdown');
+  countdown.innerHTML = '';
+  countdown.appendChild(uploadGroup);
+  countdown.style.display = 'block';
+}
+function hideUploadBtns() {
+  const countdown = document.getElementById('countdown');
+  const uploadGroup = document.getElementById('qr-upload-group');
+  if (uploadGroup && uploadGroup.parentNode) uploadGroup.parentNode.removeChild(uploadGroup);
+  if (!countdown.textContent.trim()) countdown.style.display = 'none';
+}
 
 // 区域截图识别模式
 function regionScanDelay(delay = 3) {
